@@ -1,0 +1,17 @@
+
+FROM oven/bun:1
+
+WORKDIR /usr/src/app
+
+COPY . .
+
+RUN bun install --frozen-lockfile
+
+RUN bun run generate:db
+
+RUN bunx turbo build --filter=web...
+
+EXPOSE 3000
+
+CMD ["bun", "run", "start:frontend"]
+
