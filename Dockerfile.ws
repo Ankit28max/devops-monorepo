@@ -1,14 +1,12 @@
+FROM oven/bun:1 AS base
+WORKDIR /app
 
-FROM oven/bun:1
-
-WORKDIR /usr/src/app
-
-COPY . .
+COPY package.json bun.lock ./
+COPY packages/db ./packages/db
+COPY apps/ws ./apps/ws
 
 RUN bun install --frozen-lockfile
-
-RUN bun run generate:db
+RUN cd packages/db && bunx prisma generate
 
 EXPOSE 8081
-
-CMD ["bun", "run", "start:ws"]
+CMD ["bun", "run", "apps/ws/src/index.ts"]
