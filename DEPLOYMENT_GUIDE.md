@@ -82,27 +82,25 @@ echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
 ```
 
 ### 3.3 Install Docker Engine & Docker Compose
+The most reliable method on Ubuntu is the official Docker automated installation script:
+
 ```bash
-# Update package indices
-sudo apt update && sudo apt upgrade -y
-sudo apt install -y ca-certificates curl gnupg lsb-release
+# 1. Download and run official Docker installer
+curl -fsSL https://get.docker.com -o get-docker.sh
+sudo sh get-docker.sh
 
-# Add Docker official GPG key
-sudo install -m 0755 -d /etc/apt/keyrings
-curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo gpg --dearmor -o /etc/apt/keyrings/docker.gpg
-sudo chmod a+r /etc/apt/keyrings/docker.gpg
+# 2. Add current user to docker group (run docker without sudo)
+sudo usermod -aG docker $USER
+newgrp docker
 
-# Add Docker repository
-echo \
-  "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.gpg] https://download.docker.com/linux/ubuntu \
-  $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
-  sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+# 3. Clean up installation script
+rm get-docker.sh
+```
 
-# Install Docker packages
+*(Alternative: Ubuntu's native repository)*
+```bash
 sudo apt update
-sudo apt install -y docker-ce docker-ce-cli containerd.io docker-buildx-plugin docker-compose-plugin
-
-# Grant current user permissions to run Docker without sudo
+sudo apt install -y docker.io docker-compose-v2
 sudo usermod -aG docker $USER
 newgrp docker
 ```
