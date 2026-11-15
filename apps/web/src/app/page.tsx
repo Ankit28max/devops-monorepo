@@ -7,8 +7,6 @@ interface User {
   username: string;
 }
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080";
-
 export default function Home() {
   const [users, setUsers] = useState<User[]>([]);
   const [health, setHealth] = useState<string>("Checking");
@@ -18,7 +16,7 @@ export default function Home() {
 
   const fetchHealth = async () => {
     try {
-      const res = await fetch(`${API_URL}/health`);
+      const res = await fetch("/api/health");
       const data = await res.json();
       setHealth(data.status === "ok" ? "Connected" : "Degraded");
     } catch {
@@ -28,7 +26,7 @@ export default function Home() {
 
   const fetchUsers = async () => {
     try {
-      const res = await fetch(`${API_URL}/api/users`);
+      const res = await fetch("/api/users");
       const data = await res.json();
       setUsers(Array.isArray(data) ? data : []);
     } catch {
@@ -41,7 +39,7 @@ export default function Home() {
     if (!username.trim() || !password.trim()) return;
 
     try {
-      const res = await fetch(`${API_URL}/api/users`, {
+      const res = await fetch("/api/users", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ username: username.trim(), password }),

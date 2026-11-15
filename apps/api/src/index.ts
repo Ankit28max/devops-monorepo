@@ -7,8 +7,8 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health check
-app.get("/health", async (_req, res) => {
+// Health check (supports both /health and /api/health)
+app.get(["/health", "/api/health"], async (_req, res) => {
   try {
     await prismaClient.$queryRaw`SELECT 1`;
     res.json({ status: "ok", database: "connected" });
