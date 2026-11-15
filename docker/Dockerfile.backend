@@ -1,0 +1,18 @@
+FROM oven/bun:1 AS base
+WORKDIR /app
+
+# Copy workspace root files
+COPY package.json bun.lock ./
+
+# Copy only the packages/apps needed
+COPY packages/db ./packages/db
+COPY apps/api ./apps/api
+
+# Install dependencies
+RUN bun install --frozen-lockfile
+
+# Generate Prisma client
+RUN cd packages/db && bunx prisma generate
+
+EXPOSE 8080
+CMD ["bun", "run", "apps/api/src/index.ts"]
