@@ -1,0 +1,37 @@
+name: Continuous Deployment (EC2)
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Deploy to AWS EC2 via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script_stop: true
+          script: |
+            cd /home/ubuntu/devops-monorepo
+
+            echo "Pulling latest code from main branch..."
+            git pull origin main
+
+            echo "Rebuilding and updating containers..."
+            docker compose up -d --build
+
+            echo "Applying Prisma database migrations..."
+            docker compose exec -T api bunx prisma@5 db push --schema packages/db/prisma/schema.prisma
+
+            echo "Pruning unused images..."
+            docker image prune -f
+
+            echo "Deployment completed successfully."
