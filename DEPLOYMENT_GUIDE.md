@@ -1,3 +1,4 @@
+
 # AWS EC2 Deployment and CI/CD Setup Guide
 
 Complete reference for deploying this monorepo to an AWS EC2 instance with Docker Compose, Nginx reverse proxy, SSL/TLS, and automated GitHub Actions CI/CD.

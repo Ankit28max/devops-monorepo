@@ -7,18 +7,21 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
-// Health check (supports both /health and /api/health)
-app.get(["/health", "/api/health"], async (_req, res) => {
+const handleHealth = async (_req: express.Request, res: express.Response) => {
   try {
     await prismaClient.$queryRaw`SELECT 1`;
     res.json({ status: "ok", database: "connected" });
   } catch {
     res.json({ status: "degraded", database: "disconnected" });
   }
-});
+};
+
+// Health checks
+app.get("/health", handleHealth);
+app.get("/api/health", handleHealth);
 
 // List all users
-app.get("/api/users", async (_req, res) => {
+app.get(["/users", "/api/users"], async (_req, res) => {
   try {
     const users = await prismaClient.user.findMany({
       select: { id: true, username: true },
@@ -31,7 +34,7 @@ app.get("/api/users", async (_req, res) => {
 });
 
 // Create a user
-app.post("/api/users", async (req, res) => {
+app.post(["/users", "/api/users"], async (req, res) => {
   const { username, password } = req.body ?? {};
 
   if (!username || !password) {
