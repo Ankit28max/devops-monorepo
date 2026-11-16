@@ -73,15 +73,25 @@ export default function Home() {
         </p>
       </header>
 
-      <section style={{ border: "1px solid #ddd", borderRadius: 4, padding: "0.75rem 1rem", marginBottom: "1.5rem" }}>
-        <span style={{ fontWeight: 600 }}>API Status: </span>
-        <span>{health}</span>
-        <button
-          onClick={fetchHealth}
-          style={{ marginLeft: "1rem", padding: "0.25rem 0.5rem", fontSize: "0.8rem", cursor: "pointer" }}
+      <section style={{ border: "1px solid #ddd", borderRadius: 4, padding: "0.75rem 1rem", marginBottom: "1.5rem", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
+        <div>
+          <span style={{ fontWeight: 600 }}>API Status: </span>
+          <span>{health}</span>
+          <button
+            onClick={fetchHealth}
+            style={{ marginLeft: "1rem", padding: "0.25rem 0.5rem", fontSize: "0.8rem", cursor: "pointer" }}
+          >
+            Refresh
+          </button>
+        </div>
+        <a
+          href="/api/metrics"
+          target="_blank"
+          rel="noopener noreferrer"
+          style={{ fontSize: "0.8rem", color: "#2563eb", textDecoration: "none", fontWeight: 500 }}
         >
-          Refresh
-        </button>
+          View Prometheus Metrics &rarr;
+        </a>
       </section>
 
       <section style={{ marginBottom: "1.5rem" }}>
