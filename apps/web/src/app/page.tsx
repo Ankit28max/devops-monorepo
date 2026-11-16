@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import React, { useEffect, useState, type FormEvent } from "react";
 
 interface User {
   id: string;
@@ -34,7 +34,7 @@ export default function Home() {
     }
   };
 
-  const createUser = async (e: React.FormEvent) => {
+  const createUser = async (e: FormEvent) => {
     e.preventDefault();
     if (!username.trim() || !password.trim()) return;
 
