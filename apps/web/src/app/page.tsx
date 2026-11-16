@@ -67,9 +67,9 @@ export default function Home() {
   return (
     <main style={{ maxWidth: 640, margin: "2rem auto", padding: "0 1rem", fontFamily: "sans-serif" }}>
       <header style={{ marginBottom: "1.5rem" }}>
-        <h1 style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>Service Dashboard</h1>
-        <p style={{ color: "#555", fontSize: "0.9rem" }}>
-          Next.js, Express, and PostgreSQL monorepo.
+        <h1 style={{ fontSize: "1.5rem", marginBottom: "0.25rem" }}>Production Dashboard</h1>
+        <p style={{ color: "#2563eb", fontSize: "0.9rem", fontWeight: 500 }}>
+          Deployed automatically via GitHub Actions CI/CD.
         </p>
       </header>
 
