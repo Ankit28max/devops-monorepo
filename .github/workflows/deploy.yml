@@ -1,4 +1,4 @@
-name: Continuous Deployment (EC2)
+name: Continuous Deployment & Security Verification
 
 on:
   push:
@@ -6,7 +6,37 @@ on:
       - main
 
 jobs:
+  security-scan:
+    name: Security Vulnerability Scan (Trivy)
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Run Trivy vulnerability scanner on codebase and dependencies
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          ignore-unfixed: true
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
+      - name: Build API container image for vulnerability scan
+        run: docker build -t devops-api:${{ github.sha }} -f Dockerfile.api .
+
+      - name: Scan API Docker image with Trivy
+        uses: aquasecurity/trivy-action@0.28.0
+        with:
+          image-ref: 'devops-api:${{ github.sha }}'
+          format: 'table'
+          severity: 'CRITICAL,HIGH'
+          exit-code: '0'
+
   deploy:
+    name: Deploy to AWS EC2
+    needs: security-scan
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -28,7 +58,7 @@ jobs:
             echo "Pulling latest code from main branch..."
             git pull origin main
 
-            echo "Rebuilding and updating containers..."
+            echo "Rebuilding and updating containers (including Prometheus & Grafana)..."
             docker compose up -d --build
 
             echo "Applying Prisma database migrations..."

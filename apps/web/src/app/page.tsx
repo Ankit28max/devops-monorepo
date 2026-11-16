@@ -84,14 +84,24 @@ export default function Home() {
             Refresh
           </button>
         </div>
-        <a
-          href="/api/metrics"
-          target="_blank"
-          rel="noopener noreferrer"
-          style={{ fontSize: "0.8rem", color: "#2563eb", textDecoration: "none", fontWeight: 500 }}
-        >
-          View Prometheus Metrics &rarr;
-        </a>
+        <div style={{ display: "flex", gap: "1rem", flexWrap: "wrap", marginTop: "0.5rem" }}>
+          <a
+            href="/api/metrics"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: "0.85rem", color: "#2563eb", textDecoration: "none", fontWeight: 500 }}
+          >
+            Raw Prometheus Metrics &rarr;
+          </a>
+          <a
+            href="/grafana/"
+            target="_blank"
+            rel="noopener noreferrer"
+            style={{ fontSize: "0.85rem", color: "#059669", textDecoration: "none", fontWeight: 500 }}
+          >
+            Open Grafana Dashboard &rarr;
+          </a>
+        </div>
       </section>
 
       <section style={{ marginBottom: "1.5rem" }}>
