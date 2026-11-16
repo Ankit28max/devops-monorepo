@@ -71,6 +71,23 @@ app.use((req, res, next) => {
 });
 
 // ----------------------------------------------------
+// Inter-service WebSocket Notification Helper
+// ----------------------------------------------------
+const WS_BROADCAST_URL = process.env.WS_INTERNAL_URL || "http://ws:8081/broadcast";
+
+async function notifyWebSocket(event: string, payload: unknown) {
+  try {
+    await fetch(WS_BROADCAST_URL, {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ event, payload, timestamp: new Date().toISOString() }),
+    });
+  } catch (err) {
+    console.warn(`[ws-notify] broadcast notification failed: ${(err as Error).message}`);
+  }
+}
+
+// ----------------------------------------------------
 // Prometheus Metrics Scraping Endpoint
 // ----------------------------------------------------
 const handleMetrics = async (_req: express.Request, res: express.Response) => {
@@ -97,9 +114,89 @@ app.get("/health", handleHealth);
 app.get("/api/health", handleHealth);
 
 // ----------------------------------------------------
-// Application Business Logic
+// SRE Incidents & Platform Tasks (CRUD)
 // ----------------------------------------------------
-// List all users
+// 1. List all incidents
+app.get(["/incidents", "/api/incidents"], async (_req, res) => {
+  try {
+    const incidents = await (prismaClient as any).incident.findMany({
+      orderBy: { createdAt: "desc" },
+    });
+    res.json(incidents);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to fetch incidents" });
+  }
+});
+
+// 2. Create a new incident
+app.post(["/incidents", "/api/incidents"], async (req, res) => {
+  const { title, service = "api-gateway", severity = "medium" } = req.body ?? {};
+
+  if (!title || typeof title !== "string" || !title.trim()) {
+    res.status(400).json({ error: "title is required" });
+    return;
+  }
+
+  try {
+    const incident = await (prismaClient as any).incident.create({
+      data: {
+        title: title.trim(),
+        service: String(service).trim(),
+        severity: String(severity).trim().toLowerCase(),
+        status: "investigating",
+      },
+    });
+
+    // Broadcast to all connected WebSocket clients in real-time
+    notifyWebSocket("INCIDENT_CREATED", incident);
+
+    res.status(201).json(incident);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to create incident" });
+  }
+});
+
+// 3. Update an incident (Toggle status: investigating <-> resolved)
+app.patch(["/incidents/:id", "/api/incidents/:id"], async (req, res) => {
+  const { id } = req.params;
+  const { status } = req.body ?? {};
+
+  try {
+    const updated = await (prismaClient as any).incident.update({
+      where: { id },
+      data: { status: String(status || "resolved") },
+    });
+
+    // Broadcast update
+    notifyWebSocket("INCIDENT_UPDATED", updated);
+
+    res.json(updated);
+  } catch (err) {
+    res.status(500).json({ error: "Failed to update incident" });
+  }
+});
+
+// 4. Delete an incident
+app.delete(["/incidents/:id", "/api/incidents/:id"], async (req, res) => {
+  const { id } = req.params;
+
+  try {
+    await (prismaClient as any).incident.delete({
+      where: { id },
+    });
+
+    // Broadcast deletion
+    notifyWebSocket("INCIDENT_DELETED", { id });
+
+    res.json({ id, deleted: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete incident" });
+  }
+});
+
+// ----------------------------------------------------
+// Users (Legacy / Direct Authentication Test)
+// ----------------------------------------------------
 app.get(["/users", "/api/users"], async (_req, res) => {
   try {
     const users = await prismaClient.user.findMany({
@@ -112,7 +209,6 @@ app.get(["/users", "/api/users"], async (_req, res) => {
   }
 });
 
-// Create a user
 app.post(["/users", "/api/users"], async (req, res) => {
   const { username, password } = req.body ?? {};
 

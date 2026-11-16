@@ -24,9 +24,12 @@ services:
     environment:
       PORT: 8080
       DATABASE_URL: postgresql://postgres:${POSTGRES_PASSWORD:-postgres}@postgres:5432/postgres
+      WS_INTERNAL_URL: http://ws:8081/broadcast
     depends_on:
       postgres:
         condition: service_healthy
+      ws:
+        condition: service_started
 
   ws:
     build:
