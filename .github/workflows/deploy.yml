@@ -22,6 +22,9 @@ jobs:
           script: |
             cd /home/ubuntu/devops-monorepo
 
+            echo "Discarding any unstaged local server modifications..."
+            git checkout -- .
+
             echo "Pulling latest code from main branch..."
             git pull origin main
 
