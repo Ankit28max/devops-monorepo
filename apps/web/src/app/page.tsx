@@ -223,7 +223,7 @@ export default function Home() {
         <div style={{ display: "flex", justifyContent: "space-between", alignItems: "flex-start", flexWrap: "wrap", gap: "1rem" }}>
           <div>
             <h1 style={{ fontSize: "1.75rem", fontWeight: 700, margin: 0, letterSpacing: "-0.02em" }}>
-              Acko Platform & SRE Incident Board
+              Platform & SRE Incident Board
             </h1>
             <p style={{ margin: "0.25rem 0 0", color: "#64748b", fontSize: "0.9rem" }}>
               Event-driven distributed system integrating Next.js, Express REST API, Bun WebSocket & PostgreSQL.
@@ -294,9 +294,9 @@ export default function Home() {
             style={{ flex: "1 1 140px", padding: "0.5rem 0.75rem", fontSize: "0.9rem", border: "1px solid #cbd5e1", borderRadius: "6px", background: "#fff" }}
           >
             <option value="api-gateway">api-gateway</option>
-            <option value="policy-issuance">policy-issuance</option>
-            <option value="claims-engine">claims-engine</option>
-            <option value="billing-worker">billing-worker</option>
+            <option value="auth-service">auth-service</option>
+            <option value="payment-engine">payment-engine</option>
+            <option value="notification-worker">notification-worker</option>
             <option value="database-cluster">database-cluster</option>
           </select>
 
