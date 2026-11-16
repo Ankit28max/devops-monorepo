@@ -7,6 +7,12 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Log incoming requests for debugging
+app.use((req, _res, next) => {
+  console.log(`[API] ${req.method} ${req.url}`);
+  next();
+});
+
 const handleHealth = async (_req: express.Request, res: express.Response) => {
   try {
     await prismaClient.$queryRaw`SELECT 1`;
@@ -16,11 +22,11 @@ const handleHealth = async (_req: express.Request, res: express.Response) => {
   }
 };
 
-// Health checks
+// Health checks (both paths supported)
 app.get("/health", handleHealth);
 app.get("/api/health", handleHealth);
 
-// List all users
+// List all users (both paths supported)
 app.get(["/users", "/api/users"], async (_req, res) => {
   try {
     const users = await prismaClient.user.findMany({
@@ -33,7 +39,7 @@ app.get(["/users", "/api/users"], async (_req, res) => {
   }
 });
 
-// Create a user
+// Create a user (both paths supported)
 app.post(["/users", "/api/users"], async (req, res) => {
   const { username, password } = req.body ?? {};
 
