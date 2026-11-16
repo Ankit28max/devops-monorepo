@@ -58,7 +58,7 @@ jobs:
             echo "Pulling latest code from main branch..."
             git pull origin main
 
-            echo "Rebuilding and updating containers (including Prometheus & Grafana)..."
+            echo "Rebuilding and updating containers..."
             docker compose up -d --build
 
             echo "Applying Prisma database migrations..."
